@@ -1,13 +1,12 @@
 package com.aburakkontas.wallet.classes
 
-data class LoginData (
-    val phone: String,
-    val password: String
+data class RefreshTokenData(
+    val refreshToken: String
 )
 
-data class LoginResponse (
-    val phone: String,
+data class RefreshTokenResponse(
     val token: String,
+    val phone: String,
     val refreshToken: String,
     val username: String
 )

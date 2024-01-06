@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,12 +21,36 @@ import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
 import com.aburakkontas.wallet.services.AuthService
+import com.aburakkontas.wallet.services.LocalStorage
 
 @Composable
 fun Login(navController: NavController, liveData: LiveData) {
     val phoneNumber = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    var rememberMe by remember { mutableStateOf(false) }
+
     val authService = remember { AuthService() }
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        val localStorage = LocalStorage.getInstance(context)
+        val refreshToken = localStorage.getData("refreshToken", "")
+        print("refresh token: $refreshToken")
+        if (refreshToken != "") {
+            authService.refreshToken(refreshToken) {
+                if (it != null) {
+                    liveData.token.value = it.token
+                    liveData.refreshToken.value = refreshToken
+                    liveData.username.value = it.username
+                    liveData.phone.value = it.phone
+
+                    navController.navigate("home")
+                } else {
+                    print("refresh token failed")
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -56,12 +83,37 @@ fun Login(navController: NavController, liveData: LiveData) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Checkbox(
+                    checked = rememberMe,
+                    onCheckedChange = { rememberMe = it },
+                )
+                Text("Remember Me")
+            }
+        }
+
         Button(
             onClick = {
                 authService.login(phoneNumber.value, password.value) {
                     if (it != null) {
                         liveData.token.value = it.token
                         liveData.phone.value = it.phone
+                        liveData.refreshToken.value = it.refreshToken
+                        val localStorage = LocalStorage.getInstance(context)
+                        if (rememberMe) {
+                            localStorage.saveData("refreshToken", it.refreshToken)
+                        } else {
+                            localStorage.removeData("refreshToken")
+                        }
                         navController.navigate("home")
                     } else {
                         print("login failed")
@@ -71,6 +123,32 @@ fun Login(navController: NavController, liveData: LiveData) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
+        }
+        Button(
+            onClick = {
+                authService.register(phoneNumber.value, password.value, phoneNumber.value) {
+                    if (it != null) {
+
+                        liveData.token.value = it.token
+                        liveData.phone.value = it.phone
+                        liveData.refreshToken.value = it.refreshToken
+                        liveData.username.value = it.username
+
+                        val localStorage = LocalStorage.getInstance(context)
+                        if (rememberMe) {
+                            localStorage.saveData("refreshToken", it.refreshToken)
+                        } else {
+                            localStorage.removeData("refreshToken")
+                        }
+                        navController.navigate("home")
+                    } else {
+                        print("register failed")
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Register")
         }
     }
 }

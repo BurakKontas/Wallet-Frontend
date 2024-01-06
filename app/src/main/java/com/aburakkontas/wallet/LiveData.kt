@@ -7,4 +7,6 @@ import com.aburakkontas.wallet.services.AuthService
 class LiveData : ViewModel() {
     val phone = MutableLiveData<String>("")
     val token = MutableLiveData<String>("")
+    val refreshToken = MutableLiveData<String>("")
+    val username = MutableLiveData<String>("")
 }
