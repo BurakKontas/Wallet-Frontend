@@ -1,6 +1,6 @@
 package com.aburakkontas.wallet.screens
 
-import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -46,7 +46,7 @@ fun Login(navController: NavController, liveData: LiveData) {
 
                     navController.navigate("home")
                 } else {
-                    print("refresh token failed")
+                    Toast.makeText(context, "Login Failed!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -68,7 +68,10 @@ fun Login(navController: NavController, liveData: LiveData) {
             onValueChange = { phoneNumber.value = it },
             label = { Text("Phone Number") },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Phone,
+                imeAction = ImeAction.Done
+            ),
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -116,39 +119,13 @@ fun Login(navController: NavController, liveData: LiveData) {
                         }
                         navController.navigate("home")
                     } else {
-                        print("login failed")
+                        Toast.makeText(context, "Login Failed!", Toast.LENGTH_SHORT).show()
                     }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
-        }
-        Button(
-            onClick = {
-                authService.register(phoneNumber.value, password.value, phoneNumber.value) {
-                    if (it != null) {
-
-                        liveData.token.value = it.token
-                        liveData.phone.value = it.phone
-                        liveData.refreshToken.value = it.refreshToken
-                        liveData.username.value = it.username
-
-                        val localStorage = LocalStorage.getInstance(context)
-                        if (rememberMe) {
-                            localStorage.saveData("refreshToken", it.refreshToken)
-                        } else {
-                            localStorage.removeData("refreshToken")
-                        }
-                        navController.navigate("home")
-                    } else {
-                        print("register failed")
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Register")
         }
     }
 }

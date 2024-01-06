@@ -2,6 +2,7 @@ package com.aburakkontas.wallet.services
 
 import com.aburakkontas.wallet.interfaces.AuthAPI
 import com.aburakkontas.wallet.interfaces.TransactionsAPI
+import com.aburakkontas.wallet.interfaces.UsersAPI
 import com.aburakkontas.wallet.interfaces.WalletAPI
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,5 +41,8 @@ object ServiceBuilder {
         return retrofit.create(TransactionsAPI::class.java)
     }
 
+    fun buildUsersService(): UsersAPI {
+        return retrofit.create(UsersAPI::class.java)
+    }
 
 }

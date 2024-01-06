@@ -1,17 +1,19 @@
 package com.aburakkontas.wallet.services
 
 import com.aburakkontas.wallet.classes.DepositData
+import com.aburakkontas.wallet.classes.RegisterDataResponse
 import com.aburakkontas.wallet.classes.SendMoneyData
 import com.aburakkontas.wallet.classes.TransactionsData
 import com.aburakkontas.wallet.classes.TransactionsDataResponse
 import com.aburakkontas.wallet.classes.WithdrawData
 import com.aburakkontas.wallet.enums.TransactionMode
+import com.aburakkontas.wallet.interfaces.TransactionsAPI
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class TransactionsService {
-    private val transactionsApi = ServiceBuilder.buildTransactionService()
+    private val transactionsApi: TransactionsAPI = ServiceBuilder.buildTransactionService()
 
     fun sendMoney(bearerString: String, recipientPhone: String, amount: Int, onResult: (Unit?) -> Unit) {
         val authHeader = "Bearer $bearerString"
@@ -67,21 +69,26 @@ class TransactionsService {
         })
     }
 
-    fun transactions(bearerString: String, limit: Int = 10, mode: TransactionMode, onResult: (TransactionsDataResponse?) -> Unit) {
+    fun getTransactions(bearerString: String, limit: Int = 10, mode: TransactionMode, onResult: (TransactionsDataResponse?) -> Unit) {
         val authHeader = "Bearer $bearerString"
 
-        val request = transactionsApi.transactions(authHeader, TransactionsData(limit, mode.ordinal))
+        val request = transactionsApi.getTransactions(authHeader, TransactionsData(limit, mode.ordinal))
 
-        request.enqueue(object : Callback<TransactionsDataResponse> {
-            override fun onFailure(call: Call<TransactionsDataResponse>, t: Throwable) {
-                t.printStackTrace()
-                onResult(null)
-            }
+        request.enqueue(
+            object: Callback<TransactionsDataResponse> {
+                override fun onFailure(call: Call<TransactionsDataResponse>, t: Throwable) {
+                    t.printStackTrace()
+                    onResult(null)
+                }
 
-            override fun onResponse(call: Call<TransactionsDataResponse>, response: Response<TransactionsDataResponse>) {
-                val result = response.body()
-                onResult(result)
+                override fun onResponse(
+                    call: Call<TransactionsDataResponse>,
+                    response: Response<TransactionsDataResponse>
+                ) {
+                    val result = response.body();
+                    onResult(result);
+                }
             }
-        })
+        )
     }
 }

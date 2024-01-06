@@ -8,9 +8,9 @@ import com.aburakkontas.wallet.screens.ForgotPassword
 import com.aburakkontas.wallet.screens.History
 import com.aburakkontas.wallet.screens.Home
 import com.aburakkontas.wallet.screens.Login
-import com.aburakkontas.wallet.screens.Profile
 import com.aburakkontas.wallet.screens.Register
 import com.aburakkontas.wallet.screens.Send
+import com.aburakkontas.wallet.screens.Settings
 
 @Composable
 fun AppNavigation(liveData: LiveData) {
@@ -30,19 +30,19 @@ fun AppNavigation(liveData: LiveData) {
             Send(liveData = liveData)
         }
     }
-    composable("history") {
+//    composable("history") {
+//        Layout(navController = navController, liveData = liveData) {
+//            History(liveData = liveData)
+//        }
+//    }
+    composable("settings") {
         Layout(navController = navController, liveData = liveData) {
-            History(liveData = liveData)
-        }
-    }
-    composable("profile") {
-        Layout(navController = navController, liveData = liveData) {
-            Profile(liveData = liveData)
+            Settings(liveData = liveData)
         }
     }
     composable("home") {
             Layout(navController = navController, liveData = liveData) {
-                Home(liveData = liveData)
+                Home(liveData = liveData, navController = navController)
             }
     }
     }
