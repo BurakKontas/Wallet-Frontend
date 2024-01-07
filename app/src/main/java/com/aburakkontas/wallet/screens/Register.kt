@@ -52,7 +52,7 @@ fun Register(navController: NavController, liveData: LiveData) {
     val context = LocalContext.current
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color(0x88333333),
+        focusedBorderColor = Color(0x880069a5),
         focusedLabelColor = Color(0xFF333333),
     )
 
@@ -112,8 +112,8 @@ fun Register(navController: NavController, liveData: LiveData) {
                     onCheckedChange = { rememberMe = it },
                     colors = CheckboxDefaults.colors(
                         checkmarkColor = Color.White,
-                        checkedColor = Color(0x88333333),
-                        uncheckedColor = Color(0x88333333),
+                        checkedColor = Color(0x880069a5),
+                        uncheckedColor = Color(0x880069a5),
                     )
                 )
                 Text("Remember Me")
@@ -141,7 +141,7 @@ fun Register(navController: NavController, liveData: LiveData) {
                 }
             },
             modifier = Modifier
-                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             ) {
@@ -153,7 +153,7 @@ fun Register(navController: NavController, liveData: LiveData) {
             },
             modifier = Modifier
                 .padding(top = 10.dp)
-                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             ) {

@@ -10,7 +10,7 @@ import com.aburakkontas.wallet.R
 @Composable
 fun Logo(modifier: Modifier = Modifier, contentScale: ContentScale = ContentScale.Crop) {
     Image(
-        painter = painterResource(id = R.drawable.logo),
+        painter = painterResource(id = R.drawable.logo_colored),
         contentDescription = "Logo",
         modifier = modifier,
         contentScale = contentScale

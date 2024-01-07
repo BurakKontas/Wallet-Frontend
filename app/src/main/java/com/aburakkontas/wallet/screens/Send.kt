@@ -58,7 +58,7 @@ fun Send(liveData: LiveData, navController: NavController) {
     val transactionsService = remember { TransactionsService() }
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color(0x88333333),
+        focusedBorderColor = Color(0x880069a5),
         focusedLabelColor = Color(0xFF333333),
     )
 
@@ -121,7 +121,7 @@ fun Send(liveData: LiveData, navController: NavController) {
 
         Button(
             modifier = Modifier
-                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             onClick = {

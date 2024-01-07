@@ -96,7 +96,7 @@ fun ChangePasswordSection(liveData: LiveData) {
     val context = LocalContext.current
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color(0x88333333),
+        focusedBorderColor = Color(0x880069a5),
         focusedLabelColor = Color(0xFF333333),
     )
 
@@ -157,7 +157,7 @@ fun ChangePasswordSection(liveData: LiveData) {
                 }
             },
             modifier = Modifier
-                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color.Transparent)
             ) {
@@ -186,7 +186,7 @@ fun LogoutButton(context: Context, navController: NavController) {
             navController.navigate("login")
         },
         modifier = Modifier
-            .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+            .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
             .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
