@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -81,9 +82,26 @@ fun Home(liveData: LiveData, navController: NavController) {
     }
     Column {
         HomeHeader(navController = navController)
-        BalanceCard(liveData.balance.value!!)
-        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context)
+        BalanceCard(liveData.balance.value!!, navController = navController, liveData = liveData)
+        TransactionsButton(liveData, navController)
+        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 10)
     }
+}
+
+@Composable
+fun TransactionsButton(liveData:LiveData, navController: NavController) {
+    Text(
+        text = "Transactions ->",
+        modifier = Modifier
+            .padding(horizontal = 5.dp, vertical = 8.dp)
+            .clickable {
+                navController.navigate("transactions")
+            },
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable
@@ -126,7 +144,7 @@ fun HomeHeader(navController: NavController) {
 }
 
 @Composable
-fun BalanceCard(balance: Double) {
+fun BalanceCard(balance: Double, navController: NavController, liveData: LiveData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,7 +158,7 @@ fun BalanceCard(balance: Double) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* Handle Withdraw */ },
+                onClick = { navController.navigate("withdraw") },
                 modifier = Modifier.size(40.dp)
             ) {
                 Icon(
@@ -166,7 +184,7 @@ fun BalanceCard(balance: Double) {
                 )
             }
             IconButton(
-                onClick = { /* Handle Deposit */ },
+                onClick = { navController.navigate("deposit") },
                 modifier = Modifier.size(40.dp)
             ) {
                 Icon(
@@ -181,11 +199,11 @@ fun BalanceCard(balance: Double) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionsList(transactionsService: TransactionsService, token: String, navController: NavController, context: Context) {
+fun TransactionsList(transactionsService: TransactionsService, token: String, navController: NavController, context: Context, limit: Int) {
     val transactions = remember { mutableStateOf(listOf<Transaction>()) }
 
     LaunchedEffect(true) {
-        transactionsService.getTransactions(bearerString = token, limit = 10, mode = TransactionMode.All) {
+        transactionsService.getTransactions(bearerString = token, limit = limit, mode = TransactionMode.All) {
             if (it != null) {
                 transactions.value = it.transactions
             } else {
@@ -197,29 +215,15 @@ fun TransactionsList(transactionsService: TransactionsService, token: String, na
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(
-            text = "Transactions ->",
-            modifier = Modifier
-                .padding(horizontal = 5.dp, vertical = 8.dp)
-                .clickable {
-                    navController.navigate("history")
-                },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
-                .verticalScroll(rememberScrollState())
         )
         {
-            transactions.value.forEach {
-                TransactionCard(it)
-                Spacer(modifier = Modifier.height(1.dp))
+            items(transactions.value.size) { index ->
+                TransactionCard(transaction = transactions.value[index])
             }
         }
     }
@@ -235,6 +239,8 @@ fun TransactionCard(transaction: Transaction) {
 
     val rawDate = transaction.date
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+
+    val transactionText = TransactionMode.values().firstOrNull() { it.ordinal == transaction.mode }?.text ?: ""
 
     val formattedDate = LocalDateTime.parse(rawDate.substring(0, 23), formatter)
         .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
@@ -283,7 +289,7 @@ fun TransactionCard(transaction: Transaction) {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = TransactionMode.values().firstOrNull() { it.ordinal == transaction.mode }?.text ?: "",
+                        text = transactionText,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

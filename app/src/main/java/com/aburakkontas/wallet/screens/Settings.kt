@@ -1,5 +1,7 @@
 package com.aburakkontas.wallet.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,16 +20,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
+import com.aburakkontas.wallet.services.AuthService
+import com.aburakkontas.wallet.services.LocalStorage
 
 @Composable
-fun Settings(liveData: LiveData) {
+fun Settings(liveData: LiveData, navController: NavController) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,7 +45,7 @@ fun Settings(liveData: LiveData) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Language Selection
-        LanguageSelection()
+//        LanguageSelection()
 
         // Logo
         Logo()
@@ -55,20 +63,22 @@ fun Settings(liveData: LiveData) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Change Password
-        ChangePasswordSection()
+        ChangePasswordSection(liveData)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         //Logout button
-        LogoutButton()
+        LogoutButton(context, navController = navController)
     }
 }
 
 @Composable
-fun ChangePasswordSection() {
+fun ChangePasswordSection(liveData: LiveData) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+    val authService = remember { AuthService() }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -114,7 +124,13 @@ fun ChangePasswordSection() {
 
         Button(
             onClick = {
-                // Handle password change logic here
+                authService.resetPassword(liveData.token.value!!, newPassword, currentPassword) {
+                    if (it != null) {
+                        Toast.makeText(context, "Password changed", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Error changing password", Toast.LENGTH_SHORT).show()
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -134,10 +150,13 @@ fun LanguageSelection() {
 }
 
 @Composable
-fun LogoutButton() {
+fun LogoutButton(context: Context, navController: NavController) {
+    val localStorage = LocalStorage.getInstance(context)
+
     Button(
         onClick = {
-            // Handle logout logic here
+            localStorage.removeData("refreshToken")
+            navController.navigate("login")
         },
         modifier = Modifier.fillMaxWidth()
     ) {

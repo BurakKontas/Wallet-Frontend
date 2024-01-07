@@ -26,15 +26,15 @@ interface AuthAPI {
     fun refreshToken(@Body refreshToken: RefreshTokenData): Call<RefreshTokenResponse>
 
     @Headers("Content-Type: application/json")
-    @GET("/Auth/register")
+    @POST("/Auth/register")
     fun register(@Body registerBody: RegisterData): Call<RegisterDataResponse>
 
     @Headers("Content-Type: application/json")
-    @GET("/Auth/resetPassword")
+    @POST("/Auth/resetPassword")
     fun resetPassword(@Header("Authorization") bearerToken: String, @Body resetPasswordBody: ResetPasswordData): Call<Unit>
 
     @Headers("Content-Type: application/json")
-    @GET("/Auth/validateToken")
+    @POST("/Auth/validateToken")
     fun validateToken(@Body validateTokenBody: ValidateTokenData): Call<Boolean>
 
 }

@@ -84,10 +84,10 @@ class AuthService {
         )
     }
 
-    fun resetPassword(bearerToken: String, password: String, onResult: (Unit?) -> Unit) {
+    fun resetPassword(bearerToken: String, password: String, currentPassword: String, onResult: (Unit?) -> Unit) {
         val authHeader = "Bearer $bearerToken"
 
-        val request = loginApi.resetPassword(authHeader, ResetPasswordData(password))
+        val request = loginApi.resetPassword(authHeader, ResetPasswordData(password, currentPassword))
 
         request.enqueue(object : Callback<Unit> {
             override fun onFailure(call: Call<Unit>, t: Throwable) {

@@ -21,15 +21,15 @@ import retrofit2.http.POST
 
 interface TransactionsAPI {
     @Headers("Content-Type: application/json")
-    @GET("/Transactions/sendmoney")
+    @POST("/Transactions/sendmoney")
     fun sendMoney(@Header("Authorization") bearerToken: String, @Body sendMoneyData: SendMoneyData): Call<Unit>
 
     @Headers("Content-Type: application/json")
-    @GET("/Transactions/withdraw")
+    @POST("/Transactions/withdraw")
     fun withdraw(@Header("Authorization") bearerToken: String, @Body withdrawMoneyData: WithdrawData): Call<Unit>
 
     @Headers("Content-Type: application/json")
-    @GET("/Transactions/deposit")
+    @POST("/Transactions/deposit")
     fun deposit(@Header("Authorization") bearerToken: String, @Body depositMoneyData: DepositData): Call<Unit>
 
     @Headers("Content-Type: application/json")

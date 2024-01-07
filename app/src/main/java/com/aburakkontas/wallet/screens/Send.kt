@@ -1,6 +1,7 @@
 package com.aburakkontas.wallet.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,22 +36,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.classes.Contact
+import com.aburakkontas.wallet.classes.SendMoneyData
+import com.aburakkontas.wallet.components.Logo
 import com.aburakkontas.wallet.getAllContacts
+import com.aburakkontas.wallet.services.TransactionsService
 import com.aburakkontas.wallet.services.UsersService
 
 @Composable
-fun Send(liveData: LiveData) {
+fun Send(liveData: LiveData, navController: NavController) {
     val context = LocalContext.current
     val usersService = remember { UsersService() }
+    val transactionsService = remember { TransactionsService() }
+
     LaunchedEffect(true) {
         getAllContacts(context, liveData)
         usersService.checkContacts(liveData.token.value!!, liveData.contacts.value!!.map { it.phone }) {
             if (it != null) {
-                Log.d("Contacts", it.toString())
-                liveData.contacts.value = liveData.contacts.value!!.filter { contact -> contact.phone in it.contacts }
-                Log.d("Contacts", liveData.contacts.value.toString())
+                liveData.contacts.value = liveData.contacts.value!!.filter { contact -> (contact.phone in it.contacts) && contact.phone != liveData.phone.value!! }
             }
         }
     }
@@ -62,16 +67,15 @@ fun Send(liveData: LiveData) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.9f)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Logo()
         ContactDropdownMenu(
             contacts = liveData.contacts.value!!,
             onContactSelected = { selectedContact = it }
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Amount field
         OutlinedTextField(
@@ -90,7 +94,16 @@ fun Send(liveData: LiveData) {
         Button(
             onClick = {
                 if (selectedContact != null && amount.isNotEmpty()) {
-
+                    val token = liveData.token.value!!
+                    transactionsService.sendMoney(token, selectedContact!!.phone, amount.toDouble()) {
+                        if (it != null) {
+                            Log.d("Send", it.toString())
+                            Toast.makeText(context, "Money sent", Toast.LENGTH_SHORT).show()
+                            navController.navigate("home")
+                        } else {
+                            Toast.makeText(context, "Error sending money", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

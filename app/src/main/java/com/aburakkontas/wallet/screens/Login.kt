@@ -127,5 +127,13 @@ fun Login(navController: NavController, liveData: LiveData) {
         ) {
             Text("Login")
         }
+        Button(
+            onClick = {
+                navController.navigate("register")
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Register")
+        }
     }
 }

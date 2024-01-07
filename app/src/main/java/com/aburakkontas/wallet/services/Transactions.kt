@@ -15,7 +15,7 @@ import retrofit2.Response
 class TransactionsService {
     private val transactionsApi: TransactionsAPI = ServiceBuilder.buildTransactionService()
 
-    fun sendMoney(bearerString: String, recipientPhone: String, amount: Int, onResult: (Unit?) -> Unit) {
+    fun sendMoney(bearerString: String, recipientPhone: String, amount: Double, onResult: (Unit?) -> Unit) {
         val authHeader = "Bearer $bearerString"
 
         val request = transactionsApi.sendMoney(authHeader, SendMoneyData(recipientPhone, amount))
@@ -33,7 +33,7 @@ class TransactionsService {
         })
     }
 
-    fun withdraw(bearerString: String, amount: Int, onResult: (Unit?) -> Unit) {
+    fun withdraw(bearerString: String, amount: Double, onResult: (Unit?) -> Unit) {
         val authHeader = "Bearer $bearerString"
 
         val request = transactionsApi.withdraw(authHeader, WithdrawData(amount))
@@ -51,7 +51,7 @@ class TransactionsService {
         })
     }
 
-    fun deposit(bearerString: String, amount: Int, onResult: (Unit?) -> Unit) {
+    fun deposit(bearerString: String, amount: Double, onResult: (Unit?) -> Unit) {
         val authHeader = "Bearer $bearerString"
 
         val request = transactionsApi.deposit(authHeader, DepositData(amount))
