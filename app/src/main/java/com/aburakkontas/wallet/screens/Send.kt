@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,11 +33,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.classes.Contact
@@ -51,11 +57,29 @@ fun Send(liveData: LiveData, navController: NavController) {
     val usersService = remember { UsersService() }
     val transactionsService = remember { TransactionsService() }
 
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Color(0x88333333),
+        focusedLabelColor = Color(0xFF333333),
+    )
+
     LaunchedEffect(true) {
         getAllContacts(context, liveData)
         usersService.checkContacts(liveData.token.value!!, liveData.contacts.value!!.map { it.phone }) {
             if (it != null) {
-                liveData.contacts.value = liveData.contacts.value!!.filter { contact -> (contact.phone in it.contacts) && contact.phone != liveData.phone.value!! }
+                liveData.contacts.value =
+                    liveData.contacts.value!!.filter { contact -> (contact.phone in it.contacts) && contact.phone != liveData.phone.value!! }
+                for (contact in liveData.contacts.value!!) {
+                    usersService.getUserUsername(
+                        liveData.token.value!!,
+                        contact.phone
+                    ) { username ->
+                        if (username != null) {
+                            contact.name = "${username.username} (${contact.phone})"
+                        } else {
+                            contact.name = "${contact.name} (${contact.phone})"
+                        }
+                    }
+                }
             }
         }
     }
@@ -72,9 +96,11 @@ fun Send(liveData: LiveData, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Logo()
+        Text("Send Money", style = TextStyle(fontSize = 15.sp))
+        Spacer(modifier = Modifier.height(16.dp))
         ContactDropdownMenu(
             contacts = liveData.contacts.value!!,
-            onContactSelected = { selectedContact = it }
+            onContactSelected = { selectedContact = it },
         )
 
         // Amount field
@@ -83,6 +109,8 @@ fun Send(liveData: LiveData, navController: NavController) {
             onValueChange = { amount = it },
             label = { Text("Amount") },
             singleLine = true,
+            colors = customTextFieldColors,
+            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -92,6 +120,10 @@ fun Send(liveData: LiveData, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
+            modifier = Modifier
+                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(Color.Transparent),
             onClick = {
                 if (selectedContact != null && amount.isNotEmpty()) {
                     val token = liveData.token.value!!
@@ -106,9 +138,8 @@ fun Send(liveData: LiveData, navController: NavController) {
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Send")
+            Text("Send", color = Color.Black, style = TextStyle(fontSize = 15.sp))
         }
     }
 }
@@ -124,15 +155,14 @@ fun ContactDropdownMenu(
     Box(
         modifier = Modifier
             .wrapContentSize()
-            .padding(16.dp)
     ) {
         Text(
             text = selectedContact?.name ?: "Select a contact",
             modifier = Modifier
                 .clickable { expanded = true }
-                .padding(16.dp)
                 .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
-                .padding(8.dp)
+                .padding(vertical = 4.dp)
+                .alpha(0.8f)
                 .background(Color.White)
                 .fillMaxWidth()
                 .height(48.dp)

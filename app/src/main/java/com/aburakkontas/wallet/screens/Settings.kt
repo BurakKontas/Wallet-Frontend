@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,12 +22,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
@@ -91,6 +95,11 @@ fun ChangePasswordSection(liveData: LiveData) {
     val authService = remember { AuthService() }
     val context = LocalContext.current
 
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Color(0x88333333),
+        focusedLabelColor = Color(0xFF333333),
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -103,6 +112,8 @@ fun ChangePasswordSection(liveData: LiveData) {
             label = { Text("Current Password") },
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            colors = customTextFieldColors,
+            modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { showPassword = !showPassword }) {
                     Icon(
@@ -121,6 +132,8 @@ fun ChangePasswordSection(liveData: LiveData) {
             label = { Text("New Password") },
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            colors = customTextFieldColors,
+            modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { showPassword = !showPassword }) {
                     Icon(
@@ -143,9 +156,12 @@ fun ChangePasswordSection(liveData: LiveData) {
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Change Password")
+            modifier = Modifier
+                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
+            ) {
+            Text("Change Password", color = Color.Black, style = TextStyle(fontSize = 15.sp))
         }
     }
 }
@@ -169,8 +185,11 @@ fun LogoutButton(context: Context, navController: NavController) {
             localStorage.removeData("refreshToken")
             navController.navigate("login")
         },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("Logout")
+        modifier = Modifier
+            .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+            .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+        Text("Logout", color = Color.Black, style = TextStyle(fontSize = 15.sp))
     }
 }

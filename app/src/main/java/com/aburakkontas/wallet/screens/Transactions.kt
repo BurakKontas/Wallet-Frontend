@@ -29,10 +29,6 @@ fun Transactions(liveData: LiveData, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Transactions",
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.titleMedium
-        )
-        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 100, liveData = liveData)
+        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 100, liveData = liveData, dateText = true)
     }
 }

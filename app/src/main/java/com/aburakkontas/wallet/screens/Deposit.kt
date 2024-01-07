@@ -18,11 +18,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,9 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.classes.Contact
@@ -52,6 +58,11 @@ fun Deposit(liveData: LiveData, navController: NavController) {
 
     var amount by remember { mutableStateOf("") }
 
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Color(0x88333333),
+        focusedLabelColor = Color(0xFF333333),
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,7 +73,7 @@ fun Deposit(liveData: LiveData, navController: NavController) {
     ) {
 
         Logo()
-
+        Text("Deposit", style = TextStyle(fontSize = 15.sp))
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -70,6 +81,8 @@ fun Deposit(liveData: LiveData, navController: NavController) {
             onValueChange = { amount = it },
             label = { Text("Amount") },
             singleLine = true,
+            colors = customTextFieldColors,
+            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -89,9 +102,12 @@ fun Deposit(liveData: LiveData, navController: NavController) {
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .border(1.5.dp, Color(0x88333333), shape = MaterialTheme.shapes.medium)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
-            Text("Deposit")
+            Text("Deposit", color = Color.Black, style = TextStyle(fontSize = 15.sp))
         }
     }
 }

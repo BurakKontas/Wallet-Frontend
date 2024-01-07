@@ -2,6 +2,6 @@ package com.aburakkontas.wallet.classes
 
 data class Contact (
     val id: String,
-    val name: String,
+    var name: String,
     val phone: String,
 )

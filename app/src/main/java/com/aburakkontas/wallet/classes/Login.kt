@@ -1,7 +1,7 @@
 package com.aburakkontas.wallet.classes
 
 data class LoginData (
-    val phone: String,
+    val username: String,
     val password: String
 )
 

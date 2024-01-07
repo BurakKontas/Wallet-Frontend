@@ -29,7 +29,6 @@ fun getAllContacts(context: Context, liveData: LiveData) {
 
         val contactIdIndex = cursor?.getColumnIndex(ContactsContract.Contacts._ID)
         val displayNameIndex = cursor?.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
-        val phoneIndex = cursor?.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
         if (cursor != null) {
             while (cursor.moveToNext()) {

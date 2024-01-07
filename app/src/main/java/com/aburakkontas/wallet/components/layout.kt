@@ -1,12 +1,15 @@
 package com.aburakkontas.wallet.components
 
+import android.widget.Space
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -63,9 +66,7 @@ fun BottomNavigationButton(
     Surface(
         modifier = modifier
             .padding(top = 4.dp)
-            .shadow(4.dp, shape = MaterialTheme.shapes.small)
             .clickable() { onClick.invoke() },
-        color = MaterialTheme.colorScheme.primary,
         shape = MaterialTheme.shapes.medium
     ) {
         Column(
@@ -77,11 +78,13 @@ fun BottomNavigationButton(
             Icon(
                 icon,
                 contentDescription = label,
+                tint = Color(0xBA000011)
             )
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = label,
                 modifier = Modifier.padding(horizontal = 10.dp),
-                color = Color.White
+                color = Color(0xBA000011)
             )
         }
     }
