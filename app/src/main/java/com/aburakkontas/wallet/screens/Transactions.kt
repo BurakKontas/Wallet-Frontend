@@ -33,6 +33,6 @@ fun Transactions(liveData: LiveData, navController: NavController) {
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.titleMedium
         )
-        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 100)
+        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 100, liveData = liveData)
     }
 }

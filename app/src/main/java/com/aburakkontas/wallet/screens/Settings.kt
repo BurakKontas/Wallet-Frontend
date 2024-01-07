@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,10 +32,20 @@ import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
 import com.aburakkontas.wallet.services.AuthService
 import com.aburakkontas.wallet.services.LocalStorage
+import com.aburakkontas.wallet.services.UsersService
 
 @Composable
 fun Settings(liveData: LiveData, navController: NavController) {
     val context = LocalContext.current
+    val usersService = remember { UsersService() }
+
+    LaunchedEffect(true) {
+        usersService.getUserUsername(liveData.token.value!!, liveData.phone.value!!) {
+            if (it != null) {
+                liveData.username.value = it.username
+            }
+        }
+    }
 
     Column(
         modifier = Modifier

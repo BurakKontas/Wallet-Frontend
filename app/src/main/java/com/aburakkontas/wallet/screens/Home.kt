@@ -60,6 +60,7 @@ import com.aburakkontas.wallet.classes.Transaction
 import com.aburakkontas.wallet.classes.TransactionsDataResponse
 import com.aburakkontas.wallet.enums.TransactionMode
 import com.aburakkontas.wallet.services.TransactionsService
+import com.aburakkontas.wallet.services.UsersService
 import com.aburakkontas.wallet.services.WalletService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -71,7 +72,7 @@ fun Home(liveData: LiveData, navController: NavController) {
     val transactionsService = remember { TransactionsService() }
     val context = LocalContext.current
 
-    LaunchedEffect(true) { // Her sayfa değişiminde değişiyor burada balanceyi çekebiliriz
+    LaunchedEffect(true) {
         walletService.checkBalance(liveData.token.value!!) {
             if (it != null) {
                 liveData.balance.value = it.balance
@@ -84,7 +85,7 @@ fun Home(liveData: LiveData, navController: NavController) {
         HomeHeader(navController = navController)
         BalanceCard(liveData.balance.value!!, navController = navController, liveData = liveData)
         TransactionsButton(liveData, navController)
-        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 10)
+        TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 10, liveData = liveData)
     }
 }
 
@@ -199,7 +200,7 @@ fun BalanceCard(balance: Double, navController: NavController, liveData: LiveDat
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionsList(transactionsService: TransactionsService, token: String, navController: NavController, context: Context, limit: Int) {
+fun TransactionsList(transactionsService: TransactionsService, token: String, navController: NavController, context: Context, limit: Int, liveData: LiveData) {
     val transactions = remember { mutableStateOf(listOf<Transaction>()) }
 
     LaunchedEffect(true) {
@@ -223,7 +224,7 @@ fun TransactionsList(transactionsService: TransactionsService, token: String, na
         )
         {
             items(transactions.value.size) { index ->
-                TransactionCard(transaction = transactions.value[index])
+                TransactionCard(transaction = transactions.value[index], liveData = liveData)
             }
         }
     }
@@ -232,7 +233,11 @@ fun TransactionsList(transactionsService: TransactionsService, token: String, na
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionCard(transaction: Transaction) {
+fun TransactionCard(transaction: Transaction, liveData: LiveData) {
+    val usersService = remember { UsersService() }
+    val username = remember { mutableStateOf("") }
+    val user = if (transaction.mode == TransactionMode.Send.ordinal) transaction.receiverPhone else transaction.senderPhone
+
     val alphaValue = 0.2f
     val redColor = Color(1.0f, 0.0f, 0.0f, alphaValue)
     val greenColor = Color(0.0f, 1.0f, 0.0f, alphaValue)
@@ -249,6 +254,16 @@ fun TransactionCard(transaction: Transaction) {
         redColor
     } else {
         greenColor
+    }
+
+    LaunchedEffect(true) {
+        usersService.getUserUsername(token = liveData.token.value!!, userPhone = user) {
+            if (it != null) {
+                username.value = it.username
+            } else {
+                username.value = "Unknown"
+            }
+        }
     }
 
     Box(
@@ -294,7 +309,7 @@ fun TransactionCard(transaction: Transaction) {
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = transaction.senderPhone,
+                        text = "${username.value} (${user})",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

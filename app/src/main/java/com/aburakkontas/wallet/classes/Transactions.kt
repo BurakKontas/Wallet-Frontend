@@ -9,7 +9,7 @@ data class TransactionsData (
 
 data class Transaction (
     val senderPhone: String,
-    val recipientPhone: String,
+    val receiverPhone: String,
     val amount: Double,
     val date: String,
     val mode: Int

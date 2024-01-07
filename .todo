@@ -1,0 +1,4 @@
+- Deposit ve Withdraw yapılacak
+- SSE (Server sent events) ile anlık para giriş çıkışı balance update transactions update yapılacak
+- Transactions aylara göre ayrılacak ve filtreleme yapılabilecek
+- Transactions a basınca history e atıp hepsini gösterebiliriz ilk başta sadece ilk ayınkiler olur. Onun içinde backendde işlemler yapmak lazım ayrıca filtrede history sayfasına olacak
