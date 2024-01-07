@@ -38,7 +38,7 @@ fun Login(navController: NavController, liveData: LiveData) {
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color(0x880069a5),
-        focusedLabelColor = Color(0xFF333333),
+        focusedLabelColor = Color(0xFF0069a5),
     )
 
     LaunchedEffect(true) {

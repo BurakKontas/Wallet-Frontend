@@ -100,7 +100,7 @@ fun Home(liveData: LiveData, navController: NavController) {
 //        Box(modifier = Modifier
 //            .fillMaxWidth()
 //            .height(1.dp)
-//            .background(Color(0x11333333)))
+//            .background(Color(0x110069a5)))
         BalanceCard(liveData.balance.value!!, navController = navController, liveData = liveData)
         TransactionsButton(liveData, navController)
         TransactionsList(transactionsService = transactionsService, token = liveData.token.value!!, navController = navController, context, limit = 5, liveData = liveData)
@@ -373,7 +373,7 @@ fun TransactionCard(transaction: Transaction, liveData: LiveData) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 2.dp, horizontal = 10.dp)
-            .border(2.dp, Color(0x11333333), shape = MaterialTheme.shapes.medium)
+            .border(2.dp, Color(0x110069a5), shape = MaterialTheme.shapes.medium)
     ) {
         Row(
             modifier = Modifier
