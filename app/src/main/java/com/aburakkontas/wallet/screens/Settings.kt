@@ -1,21 +1,27 @@
 package com.aburakkontas.wallet.screens
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,26 +36,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
-import com.aburakkontas.wallet.services.AuthService
-import com.aburakkontas.wallet.services.LocalStorage
-import com.aburakkontas.wallet.services.UsersService
 
 @Composable
-fun Settings(liveData: LiveData, navController: NavController) {
-    val context = LocalContext.current
-    val usersService = remember { UsersService() }
-
-    LaunchedEffect(true) {
-        usersService.getUserUsername(liveData.token.value!!, liveData.phone.value!!) {
-            if (it != null) {
-                liveData.username.value = it.username
-            }
-        }
-    }
-
+fun Settings(liveData: LiveData) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,7 +73,7 @@ fun Settings(liveData: LiveData, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         //Logout button
-        LogoutButton(context, navController = navController)
+        LogoutButton(liveData)
     }
 }
 
@@ -92,8 +82,6 @@ fun ChangePasswordSection(liveData: LiveData) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
-    val authService = remember { AuthService() }
-    val context = LocalContext.current
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color(0x880069a5),
@@ -147,15 +135,7 @@ fun ChangePasswordSection(liveData: LiveData) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {
-                authService.resetPassword(liveData.token.value!!, newPassword, currentPassword) {
-                    if (it != null) {
-                        Toast.makeText(context, "Password changed", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Error changing password", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
+            onClick = { liveData.resetPassword(currentPassword, newPassword) },
             modifier = Modifier
                 .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
@@ -177,13 +157,11 @@ fun LanguageSelection() {
 }
 
 @Composable
-fun LogoutButton(context: Context, navController: NavController) {
-    val localStorage = LocalStorage.getInstance(context)
+fun LogoutButton(liveData: LiveData) {
 
     Button(
         onClick = {
-            localStorage.removeData("refreshToken")
-            navController.navigate("login")
+            liveData.logout()
         },
         modifier = Modifier
             .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)

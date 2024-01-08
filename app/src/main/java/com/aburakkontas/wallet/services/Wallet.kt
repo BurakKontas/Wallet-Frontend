@@ -1,33 +1,39 @@
 package com.aburakkontas.wallet.services
 
 import com.aburakkontas.wallet.classes.BalanceDataResponse
+import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class WalletService {
     private val walletApi = ServiceBuilder.buildWalletService()
 
-    fun checkBalance(token: String, onResult: (BalanceDataResponse?) -> Unit) {
+    suspend fun checkBalance(token: String): BalanceDataResponse {
         val authHeader = "Bearer $token"
 
-        val request = walletApi.checkBalance(authHeader)
+        return suspendCancellableCoroutine { continuation ->
+            val request = walletApi.checkBalance(authHeader)
 
-        request.enqueue(
-            object: Callback<BalanceDataResponse> {
+            request.enqueue(object : Callback<BalanceDataResponse> {
                 override fun onFailure(call: Call<BalanceDataResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<BalanceDataResponse>,
-                    response: Response<BalanceDataResponse>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<BalanceDataResponse>, response: Response<BalanceDataResponse>) {
+                    val result = response.body()
+                    if (result != null) {
+                        return continuation.resume(result)
+                    } else {
+                        continuation.resumeWithException(Exception("Invalid credentials"))
+                    }
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
 }

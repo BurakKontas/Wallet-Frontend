@@ -1,7 +1,5 @@
 package com.aburakkontas.wallet.components
 
-import android.widget.Space
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,11 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,15 +21,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 
 @Composable
-fun Layout(navController: NavController, liveData: LiveData, content: @Composable () -> Unit) {
+fun Layout(liveData: LiveData, content: @Composable () -> Unit) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         content()
         Row(
@@ -41,16 +36,16 @@ fun Layout(navController: NavController, liveData: LiveData, content: @Composabl
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             BottomNavigationButton(label = "HomePage", icon= Icons.Default.Home) {
-                navController.navigate("home")
+                liveData.navigate("home")
             }
-            BottomNavigationButton(label = "SendMoney", icon= Icons.Default.Send) {
-                navController.navigate("send")
+            BottomNavigationButton(label = "SendMoney", icon= Icons.AutoMirrored.Filled.Send) {
+                liveData.navigate("send")
             }
             BottomNavigationButton(label = "Transactions", icon= Icons.Default.Info) {
-                navController.navigate("transactions")
+                liveData.navigate("transactions")
             }
             BottomNavigationButton(label = "Settings", icon= Icons.Default.Settings) {
-                navController.navigate("settings")
+                liveData.navigate("settings")
             }
         }
     }

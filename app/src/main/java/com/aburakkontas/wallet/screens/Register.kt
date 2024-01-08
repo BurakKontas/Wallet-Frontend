@@ -1,6 +1,5 @@
 package com.aburakkontas.wallet.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,28 +26,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.aburakkontas.wallet.LiveData
 import com.aburakkontas.wallet.components.Logo
-import com.aburakkontas.wallet.services.AuthService
-import com.aburakkontas.wallet.services.LocalStorage
 
 @Composable
-fun Register(navController: NavController, liveData: LiveData) {
+fun Register(liveData: LiveData) {
     val username = remember { mutableStateOf("") }
     val phoneNumber = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
-
-    val authService = remember { AuthService() }
-    val context = LocalContext.current
 
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color(0x880069a5),
@@ -120,26 +111,7 @@ fun Register(navController: NavController, liveData: LiveData) {
             }
         }
         Button(
-            onClick = {
-                authService.register(phoneNumber.value, password.value, username.value) {
-                    if (it != null) {
-                        liveData.token.value = it.token
-                        liveData.phone.value = it.phone
-                        liveData.refreshToken.value = it.refreshToken
-                        liveData.username.value = it.username
-
-                        val localStorage = LocalStorage.getInstance(context)
-                        if (rememberMe) {
-                            localStorage.saveData("refreshToken", it.refreshToken)
-                        } else {
-                            localStorage.removeData("refreshToken")
-                        }
-                        navController.navigate("home")
-                    } else {
-                        Toast.makeText(context, "Register Failed!", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
+            onClick = { liveData.register(username.value, phoneNumber.value, password.value) },
             modifier = Modifier
                 .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),
@@ -149,7 +121,7 @@ fun Register(navController: NavController, liveData: LiveData) {
         }
         Button(
             onClick = {
-                navController.navigate("login")
+                liveData.navigate("login")
             },
             modifier = Modifier
                 .padding(top = 10.dp)

@@ -9,117 +9,142 @@ import com.aburakkontas.wallet.classes.RegisterDataResponse
 import com.aburakkontas.wallet.classes.ResetPasswordData
 import com.aburakkontas.wallet.classes.ValidateTokenData
 import com.aburakkontas.wallet.interfaces.AuthAPI
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 
 class AuthService {
     private val loginApi: AuthAPI = ServiceBuilder.buildAuthService()
 
-    fun login(username: String, password: String, onResult: (LoginResponse?) -> Unit) {
-        val request = loginApi.login(LoginData(username, password))
+    suspend fun login(username: String, password: String): LoginResponse {
+        return suspendCancellableCoroutine { continuation ->
+            val request = loginApi.login(LoginData(username, password))
 
-        request.enqueue(
-            object: Callback<LoginResponse> {
+
+            request.enqueue(object : Callback<LoginResponse> {
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<LoginResponse>,
-                    response: Response<LoginResponse>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null) {
+                            return continuation.resume(result)
+                        } else {
+                            continuation.resumeWithException(Exception("Invalid credentials"))
+                        }
+                    } else {
+                        continuation.resumeWithException(Exception("Invalid credentials"))
+                    }
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
-    fun refreshToken(refreshToken: String, onResult: (RefreshTokenResponse?) -> Unit) {
-        val request = loginApi.refreshToken(RefreshTokenData(refreshToken))
+    suspend fun refreshToken(refreshToken: String): RefreshTokenResponse {
 
-        request.enqueue(
-            object: Callback<RefreshTokenResponse> {
+        return suspendCancellableCoroutine { continuation ->
+            val request = loginApi.refreshToken(RefreshTokenData(refreshToken))
+
+            request.enqueue(object : Callback<RefreshTokenResponse> {
                 override fun onFailure(call: Call<RefreshTokenResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<RefreshTokenResponse>,
-                    response: Response<RefreshTokenResponse>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<RefreshTokenResponse>, response: Response<RefreshTokenResponse>) {
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null) {
+                            return continuation.resume(result)
+                        } else {
+                            continuation.resumeWithException(Exception("Invalid credentials"))
+                        }
+                    } else {
+                        continuation.resumeWithException(Exception("Invalid credentials"))
+                    }
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
 
-    fun register(phone: String, password: String, username: String, onResult: (RegisterDataResponse?) -> Unit) {
-        val request = loginApi.register(RegisterData(phone, password, username))
+    suspend fun register(phone: String, password: String, username: String): RegisterDataResponse {
 
-        request.enqueue(
-            object: Callback<RegisterDataResponse> {
+        return suspendCancellableCoroutine { continuation ->
+            val request = loginApi.register(RegisterData(phone, password, username))
+
+            request.enqueue(object : Callback<RegisterDataResponse> {
                 override fun onFailure(call: Call<RegisterDataResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<RegisterDataResponse>,
-                    response: Response<RegisterDataResponse>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<RegisterDataResponse>, response: Response<RegisterDataResponse>) {
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null) {
+                            return continuation.resume(result)
+                        } else {
+                            continuation.resumeWithException(Exception("Invalid credentials"))
+                        }
+                    } else {
+                        continuation.resumeWithException(Exception("Invalid credentials"))
+                    }
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
 
-    fun resetPassword(bearerToken: String, password: String, currentPassword: String, onResult: (Unit?) -> Unit) {
+    suspend fun resetPassword(bearerToken: String, password: String, currentPassword: String): Boolean {
         val authHeader = "Bearer $bearerToken"
 
-        val request = loginApi.resetPassword(authHeader, ResetPasswordData(password, currentPassword))
+        return suspendCancellableCoroutine { continuation ->
+            val request = loginApi.resetPassword(authHeader, ResetPasswordData(password, currentPassword))
 
-        request.enqueue(object : Callback<Unit> {
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                t.printStackTrace()
-                onResult(null)
-            }
+            request.enqueue(object : Callback<Unit> {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    continuation.resumeWithException(t)
+                }
 
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                val result = response.body()
-                onResult(result)
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    return continuation.resume(response.isSuccessful)
+                }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        })
+        }
     }
 
-    fun validateToken(token: String, onResult: (Boolean?) -> Unit) {
-        val request = loginApi.validateToken(ValidateTokenData(token))
+    suspend fun validateToken(token: String): Boolean {
 
-        request.enqueue(
-            object: Callback<Boolean> {
+        return suspendCancellableCoroutine { continuation ->
+            val request = loginApi.validateToken(ValidateTokenData(token))
+
+            request.enqueue(object : Callback<Boolean> {
                 override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<Boolean>,
-                    response: Response<Boolean>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                    return if(response.isSuccessful) continuation.resume(response.body()!!)
+                    else continuation.resume(false)
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
 }

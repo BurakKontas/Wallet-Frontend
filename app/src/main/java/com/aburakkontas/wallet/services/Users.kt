@@ -1,39 +1,41 @@
 package com.aburakkontas.wallet.services
 
-import com.aburakkontas.wallet.classes.BalanceDataResponse
 import com.aburakkontas.wallet.classes.CheckContactsData
 import com.aburakkontas.wallet.classes.CheckContactsDataResponse
 import com.aburakkontas.wallet.classes.GetUsernameData
 import com.aburakkontas.wallet.classes.GetUsernameDataResponse
 import com.aburakkontas.wallet.interfaces.UsersAPI
+import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class UsersService {
     private val usersApi: UsersAPI = ServiceBuilder.buildUsersService()
 
-    fun checkContacts(token: String, contacts: List<String>,  onResult: (CheckContactsDataResponse?) -> Unit) {
+    suspend fun checkContacts(token: String, contacts: List<String>): CheckContactsDataResponse {
         val authHeader = "Bearer $token"
 
-        val request = usersApi.checkContacts(authHeader, CheckContactsData(contacts))
+        return suspendCancellableCoroutine { continuation ->
+            val request = usersApi.checkContacts(authHeader, CheckContactsData(contacts))
 
-        request.enqueue(
-            object: Callback<CheckContactsDataResponse> {
+            request.enqueue(object : Callback<CheckContactsDataResponse> {
                 override fun onFailure(call: Call<CheckContactsDataResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<CheckContactsDataResponse>,
-                    response: Response<CheckContactsDataResponse>
-                ) {
-                    val result = response.body();
-                    onResult(result);
+                override fun onResponse(call: Call<CheckContactsDataResponse>, response: Response<CheckContactsDataResponse>) {
+                    val result = response.body()
+                    if (result != null) {
+                        return continuation.resume(result)
+                    } else {
+                        continuation.resumeWithException(Exception("Invalid credentials"))
+                    }
                 }
-            }
-        )
+            })
+        }
     }
 
     fun getUserUsername(token: String, userPhone:String, onResult: (GetUsernameDataResponse?) -> Unit) {
@@ -52,8 +54,12 @@ class UsersService {
                     call: Call<GetUsernameDataResponse>,
                     response: Response<GetUsernameDataResponse>
                 ) {
-                    val result = response.body();
-                    onResult(result);
+                    val result = response.body()
+                    if(response.isSuccessful) {
+                        onResult(result)
+                    } else {
+                        onResult(null)
+                    }
                 }
             }
         )

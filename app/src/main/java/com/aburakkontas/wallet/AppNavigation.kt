@@ -1,6 +1,7 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,43 +18,46 @@ import com.aburakkontas.wallet.screens.Withdraw
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavigation(liveData: LiveData) {
+fun AppNavigation() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val liveData = LiveData(context, navController)
+
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            Login(navController = navController, liveData = liveData)
+            Login(liveData = liveData)
         }
         composable("register") {
-            Register(navController = navController, liveData = liveData)
+            Register(liveData = liveData)
         }
         composable("send") {
-            Layout(navController = navController, liveData = liveData) {
-                Send(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Send(liveData = liveData)
             }
         }
         composable("deposit") {
-            Layout(navController = navController, liveData = liveData) {
-                Deposit(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Deposit(liveData = liveData)
             }
         }
         composable("withdraw") {
-            Layout(navController = navController, liveData = liveData) {
-                Withdraw(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Withdraw(liveData = liveData)
             }
         }
         composable("settings") {
-            Layout(navController = navController, liveData = liveData) {
-                Settings(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Settings(liveData = liveData)
             }
         }
         composable("home") {
-            Layout(navController = navController, liveData = liveData) {
-                Home(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Home(liveData = liveData)
             }
         }
         composable("transactions") {
-            Layout(navController = navController, liveData = liveData) {
-                Transactions(liveData = liveData, navController = navController)
+            Layout(liveData = liveData) {
+                Transactions(liveData = liveData)
             }
         }
 
