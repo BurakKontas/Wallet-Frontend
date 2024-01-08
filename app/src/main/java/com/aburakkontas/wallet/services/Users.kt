@@ -35,33 +35,36 @@ class UsersService {
                     }
                 }
             })
+
+            continuation.invokeOnCancellation {
+                request.cancel()
+            }
         }
     }
 
-    fun getUserUsername(token: String, userPhone:String, onResult: (GetUsernameDataResponse?) -> Unit) {
+    suspend fun getUserUsername(token: String, userPhone:String): GetUsernameDataResponse {
         val authHeader = "Bearer $token"
 
-        val request = usersApi.getUserUsername(authHeader, GetUsernameData(userPhone))
+        return suspendCancellableCoroutine { continuation ->
+            val request = usersApi.getUserUsername(authHeader, GetUsernameData(userPhone))
 
-        request.enqueue(
-            object: Callback<GetUsernameDataResponse> {
+            request.enqueue(object : Callback<GetUsernameDataResponse> {
                 override fun onFailure(call: Call<GetUsernameDataResponse>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
+                    continuation.resumeWithException(t)
                 }
 
-                override fun onResponse(
-                    call: Call<GetUsernameDataResponse>,
-                    response: Response<GetUsernameDataResponse>
-                ) {
+                override fun onResponse(call: Call<GetUsernameDataResponse>, response: Response<GetUsernameDataResponse>) {
                     val result = response.body()
-                    if(response.isSuccessful) {
-                        onResult(result)
+                    if (result != null) {
+                        return continuation.resume(result)
                     } else {
-                        onResult(null)
+                        continuation.resumeWithException(Exception("Invalid credentials"))
                     }
                 }
+            })
+            continuation.invokeOnCancellation {
+                request.cancel()
             }
-        )
+        }
     }
 }

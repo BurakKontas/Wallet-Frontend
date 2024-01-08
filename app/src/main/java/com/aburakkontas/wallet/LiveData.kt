@@ -188,7 +188,7 @@ class LiveData(private val context: Context, private val navController: NavContr
                 val result = usersService.checkContacts(token.value!!, contactPhoneList)
                 contacts.value = contacts.value!!.filter { contact -> (contact.phone in result.contacts) && contact.phone != phone.value!! }
                 for(contact in contacts.value!!) {
-                    usersService.getUserUsername(token.value!!, contact.phone) { username ->
+                    this@LiveData.getUsername(contact.phone) { username ->
                         if(username != null) contact.name = "${username.username} (${contact.phone})"
                         else contact.name = "Unknown (${contact.phone})"
                     }
@@ -217,6 +217,9 @@ class LiveData(private val context: Context, private val navController: NavContr
     }
 
     fun getUsername(phone: String, onResult: (GetUsernameDataResponse?) -> Unit) {
-        usersService.getUserUsername(token.value!!, phone, onResult)
+        viewModelScope.launch {
+            val result = usersService.getUserUsername(this@LiveData.token.value!!, phone)
+            onResult(result)
+        }
     }
 }
