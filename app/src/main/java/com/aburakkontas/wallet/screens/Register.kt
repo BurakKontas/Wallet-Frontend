@@ -111,7 +111,7 @@ fun Register(liveData: LiveData) {
             }
         }
         Button(
-            onClick = { liveData.register(username.value, phoneNumber.value, password.value) },
+            onClick = { liveData.register(phoneNumber.value, username.value, password.value) },
             modifier = Modifier
                 .border(1.5.dp, Color(0x880069a5), shape = MaterialTheme.shapes.medium)
                 .fillMaxWidth(),

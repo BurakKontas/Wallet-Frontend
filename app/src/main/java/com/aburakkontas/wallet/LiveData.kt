@@ -72,7 +72,7 @@ class LiveData(private val context: Context, private val navController: NavContr
     fun register(phone: String, username: String, password: String, remember_me: Boolean = false) {
         viewModelScope.launch {
             try {
-                val result = authService.register(phone, username, password)
+                val result = authService.register(phone, password, username)
                 this@LiveData.token.value = result.token
                 this@LiveData.refreshToken.value = result.refreshToken
                 this@LiveData.username.value = result.username
